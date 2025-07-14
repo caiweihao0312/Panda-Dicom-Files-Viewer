@@ -1,0 +1,453 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+		            xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity">
+
+
+    <Style x:Key="EmptyButton" TargetType="{x:Type Button}">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Visibility" Value="Visible"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Grid x:Name="Chrome" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsVisible}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding NoDisturb}" Value="False">
+                <Setter Property="Opacity" Value="0.5"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--设置Button按钮圆角样式-->
+    <Style x:Key="CircularButton" TargetType="{x:Type Button}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border BorderBrush="{TemplateBinding Control.BorderBrush}" BorderThickness="1" CornerRadius="5,5,5,5" Name="PART_Background">
+                        <Border.Background>
+                            <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
+                                <GradientStop Color="White" Offset="0.0" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <ContentPresenter Content="{TemplateBinding ContentControl.Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="UIElement.IsMouseOver" Value="True">
+                            <Setter Property="Border.BorderBrush" TargetName="PART_Background">
+                                <Setter.Value>
+                                    <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
+                                        <GradientStop Color="#6799FA" Offset="0.0" />
+                                    </LinearGradientBrush>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Foreground" Value="#6799FA"/>
+                        </Trigger>
+                        <Trigger Property="ButtonBase.IsPressed" Value="True">
+                            <Setter Property="UIElement.Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect BlurRadius="5" Color="#4D68FF" Direction="0" Opacity="0.6" RenderingBias="Performance" ShadowDepth="0" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <!--设置Button按钮圆角样式-->
+    <!--主要按钮-->
+    <Style x:Key="CircularButtonOK" TargetType="{x:Type Button}">
+        <Setter Property="Foreground" Value="{DynamicResource NavigationButtonFontColor}">
+            
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border  CornerRadius="5,5,5,5" Name="PART_Background">
+                        <Border.Background>
+                            <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
+                                <GradientStop Color="{DynamicResource MainColorBrush}" Offset="0.0" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Border.BorderBrush>
+                            <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
+                                <GradientStop Color="{DynamicResource MainBorderColorBrush}" Offset="0.0" />
+                            </LinearGradientBrush>
+                        </Border.BorderBrush>
+                        <ContentPresenter Content="{TemplateBinding ContentControl.Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="UIElement.IsMouseOver" Value="True">
+
+                            <Setter Property="Border.Background" TargetName="PART_Background">
+                                <Setter.Value>
+                                    <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
+                                        <GradientStop Color="{DynamicResource MainHoverColorBrush}" Offset="0.0" />
+                                    </LinearGradientBrush>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+
+                        <Trigger Property="ButtonBase.IsPressed" Value="True">
+                            <Setter Property="Border.Background" TargetName="PART_Background">
+                                <Setter.Value>
+                                    <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
+                                        <GradientStop Color="{DynamicResource MainClickColorBrush}" Offset="0.0" />
+                                    </LinearGradientBrush>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Foreground" Value="{DynamicResource OpacityNavigationButtonFontColor}" />
+                        </Trigger>
+
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5"></Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.5"></Setter>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--设置专业版 Button按钮圆角样式（NORMAL灰色）-->
+    <!--次要按钮-->
+    <Style x:Key="CircularButtonPro_Normal" TargetType="{x:Type Button}">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Foreground" Value="{DynamicResource CommonFontsColor}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border BorderBrush="{DynamicResource BorderBrushNormalColor}"  Padding="{TemplateBinding Padding }"  Background="{DynamicResource BorderBackgroundNormalColor}" BorderThickness="1" CornerRadius="4" Name="PART_Background">
+                        <ContentPresenter Content="{TemplateBinding ContentControl.Content}" HorizontalAlignment="Center" VerticalAlignment="Center"  />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="UIElement.IsMouseOver" Value="True">
+                            <Setter Property="Border.BorderThickness" Value="0" TargetName="PART_Background"/>
+                            <Setter Property="Border.BorderBrush" Value="{DynamicResource BorderBrushHoverColor}" TargetName="PART_Background"/>
+                            <Setter Property="Border.Background" Value="{DynamicResource BorderBackgroundHoverColor}" TargetName="PART_Background"/>
+                            <Setter Property="Foreground" Value="{DynamicResource NavigationFontsColor}"/>
+                        </Trigger>
+                        <Trigger Property="ButtonBase.IsPressed" Value="True">
+                            <Setter Property="Border.BorderBrush" Value="{DynamicResource BorderBrushNormalColor}" TargetName="PART_Background"/>
+                            <Setter Property="Border.Background" Value="{DynamicResource BorderBackgroundClickColor}" TargetName="PART_Background"/>
+                            <Setter Property="Foreground" Value="{DynamicResource ButtonPressFontsColor}"/>
+                        </Trigger>
+                        <Trigger Property="ButtonBase.IsEnabled" Value="False">
+                            <Setter Property="Border.BorderBrush" Value="{DynamicResource BorderBrushNormalColor}" TargetName="PART_Background"/>
+                            <Setter Property="Border.Background" Value="{DynamicResource BorderBackgroundNormalColor}" TargetName="PART_Background"/>
+                            <Setter Property="Foreground" Value="{DynamicResource ButtonIsEnabledFontsColor}"/>
+                            <Setter Property="Opacity" Value="0.5"/>
+                        </Trigger>
+                        <Trigger Property="IsDefault" Value="True">
+                            <Setter Property="Border.BorderBrush" Value="{DynamicResource BorderBrushHoverColor}" TargetName="PART_Background"/>
+                            <Setter Property="Border.Background" Value="{DynamicResource BorderBackgroundHoverColor}" TargetName="PART_Background"/>
+                            <Setter Property="Foreground" Value="{DynamicResource NavigationFontsColor}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!--加载更多-->
+    <Style x:Key="LoadMoreBtn" TargetType="{x:Type Button}">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Foreground" Value="{DynamicResource OpacityCommonFontsColor}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border Background="{DynamicResource LoadMoreBackColor}" BorderThickness="0" CornerRadius="4" Name="PART_Background">
+                        <ContentPresenter Content="{TemplateBinding ContentControl.Content}" HorizontalAlignment="Center" VerticalAlignment="Center"  />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="UIElement.IsMouseOver" Value="True">
+                            <Setter Property="Border.Background" Value="{DynamicResource Opacity7MainColor}" TargetName="PART_Background"/>
+                        </Trigger>
+                        <Trigger Property="ButtonBase.IsPressed" Value="True">
+                            <Setter Property="Border.Background" Value="{DynamicResource Opacity7MainColor}" TargetName="PART_Background"/>
+                        </Trigger>
+                        <Trigger Property="IsDefault" Value="True">
+                            <Setter Property="Border.Background" Value="{DynamicResource LoadMoreBackColor}" TargetName="PART_Background"/>
+                            <Setter Property="Foreground" Value="{DynamicResource OpacityCommonFontsColor}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--消息按钮 鼠标划过边界蓝色-->
+   
+    <Style x:Key="CircularButtonMouseOverBorderBlue" TargetType="{x:Type Button}">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Foreground" Value="{DynamicResource CommonFontsColor}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border BorderBrush="{TemplateBinding BorderBrush}" Background="{DynamicResource BackgroundNormalColor}"  BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6" Name="PART_Background">
+                        <ContentPresenter Content="{TemplateBinding ContentControl.Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="UIElement.IsMouseOver" Value="True">
+                            <Setter Property="Border.BorderBrush" Value="{DynamicResource MainColor}" TargetName="PART_Background"/>
+                            <Setter Property="Border.BorderThickness" Value="1" TargetName="PART_Background"/>
+                            <Setter Property="Border.Background" Value="{DynamicResource MouseOverBorderBlueBtnBackColor}" TargetName="PART_Background"/>
+                        </Trigger>
+                        <Trigger Property="ButtonBase.IsPressed" Value="True">
+                            <Setter Property="Border.Background" Value="{DynamicResource ToggleBackgroundColor}" TargetName="PART_Background"/>
+                            <Setter Property="Border.BorderThickness" Value="1" TargetName="PART_Background"/>
+                            <Setter Property="Border.Background" Value="{DynamicResource MouseOverBorderBlueBtnBackColor}" TargetName="PART_Background"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!--消息强调按钮 鼠标划过边界蓝色-->
+    <Style x:Key="CircularButtonMouseOverRedBorderBlue" TargetType="{x:Type Button}">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Foreground" Value="{DynamicResource WhiteColor}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border BorderBrush="{TemplateBinding BorderBrush}" Background="{DynamicResource MessageBackGroundColor}"  BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6" Name="PART_Background">
+                        <ContentPresenter Content="{TemplateBinding ContentControl.Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="UIElement.IsMouseOver" Value="True">
+                            <Setter Property="Border.BorderBrush" Value="{DynamicResource WhiteColor}" TargetName="PART_Background"/>
+                            <Setter Property="Border.BorderThickness" Value="1" TargetName="PART_Background"/>
+                        </Trigger>
+                        <Trigger Property="ButtonBase.IsPressed" Value="True">
+                            <Setter Property="Border.Background" Value="{DynamicResource WhiteColor}" TargetName="PART_Background"/>
+                            <Setter Property="Border.BorderThickness" Value="1" TargetName="PART_Background"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--设置直角按键样式（NORMAL灰色）-->
+    <Style x:Key="RightAngleButtonPro_Normal" TargetType="{x:Type Button}">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Foreground" Value="{DynamicResource CommonFontsColor}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border BorderBrush="{DynamicResource PopupBorderBrushNormalColor}" Background="{DynamicResource CloudSearchBackgroundColor}" BorderThickness="1" Name="PART_Background">
+                        <ContentPresenter Content="{TemplateBinding ContentControl.Content}" HorizontalAlignment="Center" VerticalAlignment="Center"  />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="UIElement.IsMouseOver" Value="True">
+                            <Setter Property="Border.BorderBrush" Value="{DynamicResource BorderBrushHoverColor}" TargetName="PART_Background"/>
+                            <Setter Property="Border.Background" Value="{DynamicResource BorderBackgroundHoverColor}" TargetName="PART_Background"/>
+                            <Setter Property="Foreground" Value="{DynamicResource NavigationFontsColor}"/>
+                        </Trigger>
+                        <Trigger Property="ButtonBase.IsPressed" Value="True">
+                            <Setter Property="Border.BorderBrush" Value="{DynamicResource BorderBrushNormalColor}" TargetName="PART_Background"/>
+                            <Setter Property="Border.Background" Value="{DynamicResource BorderBackgroundClickColor}" TargetName="PART_Background"/>
+                            <Setter Property="Foreground" Value="{DynamicResource ButtonPressFontsColor}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SmallIconTextButtonBorderShadowStyle" TargetType="{x:Type Border}" BasedOn="{StaticResource SmallIconTextButtonBorderStyle}">
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect ShadowDepth="2" Direction="270" Color="#373d41" BlurRadius="3" Opacity="0.4"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SmallIconTextButtonTextStyle" TargetType="{x:Type TextBlock}">
+        <Setter Property="Margin" Value="6,0,0,2"/>
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="Foreground" Value="Black"/>
+    </Style>
+
+    <Style x:Key="SmallIconTextButtonBorderStyle" TargetType="{x:Type Border}">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+    
+    <!-- 文字图像小按钮模板（普通） -->
+    <ControlTemplate x:Key="SmallIconTextButtonNormalTemplate" TargetType="{x:Type Button}">
+        <Border Style="{DynamicResource SmallIconTextButtonBorderStyle}" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}" Padding="{TemplateBinding Padding}">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" >
+                <Image Width="{TemplateBinding Width}" Stretch="None" Source="{Binding NormalIcon}"/>
+                <TextBlock Style="{DynamicResource SmallIconTextButtonTextStyle}"  Foreground="{StaticResource ButtonPressFontsColor}" VerticalAlignment="Center" Text="{Binding Text}"/>
+            </StackPanel>
+        </Border>
+    </ControlTemplate>
+    <!-- 文字图像小按钮模板（悬停） -->
+    <ControlTemplate x:Key="SmallIconTextButtonHoverTemplate" TargetType="{x:Type Button}">
+        <Border     Padding="{TemplateBinding Padding}" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" >
+                <Image  Width="{TemplateBinding Width}" Stretch="None" Source="{Binding HoverIcon}"/>
+                <TextBlock Style="{DynamicResource SmallIconTextButtonTextStyle}"  Foreground="#2481FF" VerticalAlignment="Center" Text="{Binding Text}"/>
+            </StackPanel>
+        </Border>
+    </ControlTemplate>
+    <!-- 文字图像小按钮模板（点击） -->
+    <ControlTemplate x:Key="SmallIconTextButtonPressTemplate" TargetType="{x:Type Button}">
+        <Border   Padding="{TemplateBinding Padding}" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" >
+                <Image  Width="{TemplateBinding Width}" Stretch="None" Source="{Binding PressIcon}"/>
+                <TextBlock Style="{DynamicResource SmallIconTextButtonTextStyle}"   Foreground="#2481FF" VerticalAlignment="Center" Text="{Binding Text}"/>
+            </StackPanel>
+        </Border>
+    </ControlTemplate>
+
+    <Style x:Key="HorizontalIconTextButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource EmptyButton}">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="UseLayoutRounding" Value="True"/>
+        <Setter Property="Command" Value="{Binding Command}"/>
+        <Setter Property="Template" Value="{DynamicResource SmallIconTextButtonNormalTemplate}"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Template" Value="{DynamicResource SmallIconTextButtonHoverTemplate}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Template" Value="{DynamicResource SmallIconTextButtonPressTemplate}"/>
+            </Trigger>
+            <!--<Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Template" Value="{DynamicResource SmallIconTextButtonDisableTemplate}"/>
+            </Trigger>-->
+        </Style.Triggers>
+    </Style>
+    
+   <!--                      移动变色按钮                     -->
+    <Style x:Key="Button_Menu" TargetType="{x:Type Button}">
+        <Setter Property="Width" Value="24" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{DynamicResource NavigationFontsColor}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="MyBackgroundElement" BorderBrush="Transparent" Background="{TemplateBinding Background}" CornerRadius="2"  BorderThickness="0">
+                        <ContentPresenter x:Name="ButtonContentPresenter" VerticalAlignment="Center" HorizontalAlignment="{TemplateBinding HorizontalAlignment}"/>
+                     </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter  Property="Foreground" Value="{DynamicResource NavigationFontsColor}"/>
+      
+                            <Setter TargetName="MyBackgroundElement" Property="Opacity" Value="0.7"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
+
+    <!--                      移动变色按钮（重置）                     -->
+    <Style x:Key="Button_Reset" TargetType="{x:Type Button}">
+        <Setter Property="Width" Value="Auto" />
+        <Setter Property="Height" Value="Auto" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{DynamicResource CommonFontsColor}"/>
+        <Setter Property="Opacity" Value="1"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="MyBackgroundElement" BorderBrush="Transparent" Background="{TemplateBinding Background}" CornerRadius="2"  BorderThickness="0">
+                        <ContentPresenter x:Name="ButtonContentPresenter" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter  Property="Foreground" Value="{DynamicResource MainColor}"/>
+                            <Setter TargetName="MyBackgroundElement" Property="Opacity" Value="1"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    
+    <!--                      移动变色按钮（关闭）                     -->
+    <Style x:Key="Button_Close" TargetType="{x:Type Button}">
+        <Setter Property="Width" Value="Auto" />
+        <Setter Property="Height" Value="Auto" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{DynamicResource CommonFontsColor}"/>
+        <Setter Property="IsEnabled" Value="{Binding IsEnabled, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="MyBackgroundElement" BorderBrush="Transparent" Background="{TemplateBinding Background}" CornerRadius="2"  BorderThickness="0">
+                        <ContentPresenter x:Name="ButtonContentPresenter" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter  Property="Foreground" Value="{DynamicResource MainColor}"/>
+                            <Setter TargetName="MyBackgroundElement" Property="Opacity" Value="1"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="True">
+                            <Setter  Property="Foreground" Value="{DynamicResource CommonFontsColor}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter  Property="Foreground" Value="{DynamicResource OpacityCommonFontsColor}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
+
+
+    <!--        移动变色按钮 白色字体蓝色底色 
+                例子：主界面设置菜单              -->
+    <Style x:Key="Button_MenuSetting" TargetType="{x:Type Button}">
+        <Setter Property="Width" Value="24" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{DynamicResource CommonFontsColor}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="MyBackgroundElement" BorderBrush="Transparent" Background="{TemplateBinding Background}" CornerRadius="2"  BorderThickness="0">
+                        <ContentPresenter x:Name="ButtonContentPresenter" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="White"/>
+                            <Setter TargetName="MyBackgroundElement" Property="Background" Value="{DynamicResource BorderBackgroundHoverColor}"/>
+                            <!--<Setter TargetName="MyBackgroundElement" Property="Opacity" Value="0.7"/>-->
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.4"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    
+</ResourceDictionary>

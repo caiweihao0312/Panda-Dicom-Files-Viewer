@@ -1,0 +1,113 @@
+﻿<Window x:Class="MedicalImagingSystemCore.Views.TestWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MedicalImagingSystemCore.Views"
+        mc:Ignorable="d"
+        Title="TestWindow" Height="450" Width="800">
+    <Grid Grid.Name="d" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+        <Grid>
+            <FrameworkElement.Resources>
+                <ResourceDictionary>
+                    <Style Style.TargetType="{x:Type Border}">
+                        <Setter Setter.Property="UIElement.Opacity" Setter.Value="0.7" />
+                        <Setter Setter.Property="Border.Background" Setter.Value="#FF4D4D4D" />
+                        <Style.Triggers>
+                            <Trigger Trigger.Property="UIElement.IsMouseOver" Trigger.Value="True" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                                <Setter Setter.Property="UIElement.Opacity" Setter.Value="1" />
+                                <Setter Setter.Property="Border.Background" Setter.Value="#FF094771" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ResourceDictionary>
+            </FrameworkElement.Resources>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition ColumnDefinition.Name="e" ColumnDefinition.Width="255px" ColumnDefinition.MinWidth="255px" ColumnDefinition.MaxWidth="500px" />
+                <ColumnDefinition ColumnDefinition.Name="f" ColumnDefinition.Width="2" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Name="g" Grid.Row="0">
+                <TextBlock TextBlock.Name="h" TextBlock.Text UIElement.Visibility="{Binding SelectLanguage,Converter={StaticResource languageToVisibilityConverter},ConverterParameter=zh-CN}" />
+                <TextBlock TextBlock.Name="i" TextBlock.Text UIElement.Visibility="{Binding SelectLanguage,Converter={StaticResource languageToVisibilityConverter},ConverterParameter=en-US}" />
+                <TextBlock TextBlock.Name="j" TextBlock.Text UIElement.Visibility="{Binding SelectLanguage,Converter={StaticResource languageToVisibilityConverter},ConverterParameter=French}" />
+            </Grid>
+            <Grid Grid.Row="1" Grid.Column="2" Panel.Background="{DynamicResource General.BackgroundColor}" UIElement.AllowDrop="True">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition RowDefinition.Height="auto" />
+                        <RowDefinition />
+                        <RowDefinition RowDefinition.Height="20" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0" StackPanel.Orientation="Horizontal" FrameworkElement.HorizontalAlignment="Right" FrameworkElement.Width="auto" FrameworkElement.VerticalAlignment="Top" FrameworkElement.Margin="0,35,15,0" FrameworkElement.MinWidth="10">
+                        <Button Button.Name="k" FrameworkElement.ToolTip="{DynamicResource CONFIG_CommonSetup_Language}" FrameworkElement.HorizontalAlignment="Right" FrameworkElement.Margin="10,0,0,0" FrameworkElement.Width="auto" FrameworkElement.Height="25" FrameworkElement.Style="{StaticResource FileButtonStyle}">
+                            <StackPanel StackPanel.Orientation="Horizontal" FrameworkElement.HorizontalAlignment="Center">
+                                <Image Image.Source="Icons\Main\img_Language.png" UIElement.Opacity="0.7" FrameworkElement.Margin="5,0,0,0" FrameworkElement.Width="15" FrameworkElement.Height="15" Image.Stretch="Uniform" />
+                                <TextBlock TextBlock.FontSize="14" TextBlock.Foreground="#FFFFFFFF" FrameworkElement.VerticalAlignment="Center" FrameworkElement.Margin="5,0,0,0" TextBlock.Text="{Binding SelectLanguageStr,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                                <Image Image.Source="Icons\Files\img_arrow_downward.png" UIElement.Opacity="1" FrameworkElement.Margin="5,0,0,0" FrameworkElement.Width="15" FrameworkElement.Height="15" Image.Stretch="Uniform" />
+                            </StackPanel>
+                        </Button>
+                        <Popup Popup.Name="l" Popup.IsOpen="False" Popup.StaysOpen="False" FrameworkElement.Style="{StaticResource PopupStyle}" Popup.HorizontalOffset="2" FrameworkElement.Width="{Binding Path=ActualWidth,ElementName=k}" Popup.PlacementTarget="{Binding ElementName=k}">
+                            <Grid Panel.Background="#FF424242">
+                                <Border Border.BorderBrush="#FF797979" Border.BorderThickness="1">
+                                    <StackPanel FrameworkElement.HorizontalAlignment="Stretch" FrameworkElement.VerticalAlignment="Stretch" FrameworkElement.Margin="0,0,0,0">
+                                        <Button Button.Name="m" ContentControl.Content="中文" ButtonBase.CommandParameter="zh-CN" Control.Foreground="#FFFFFFFF" FrameworkElement.HorizontalAlignment="Stretch" FrameworkElement.Height="auto" FrameworkElement.Margin="0,0,0,0" FrameworkElement.Style="{StaticResource PopupButtonStyle}" ButtonBase.Command="{Binding SetLanguageCommand}" FrameworkElement.Width="{Binding Path=Width,ElementName=k}" />
+                                        <Button Button.Name="n" ContentControl.Content="English" ButtonBase.CommandParameter="en-US" Control.Foreground="#FFFFFFFF" FrameworkElement.HorizontalAlignment="Stretch" FrameworkElement.Height="auto" FrameworkElement.Margin="0,0,0,0" FrameworkElement.Style="{StaticResource PopupButtonStyle}" ButtonBase.Command="{Binding SetLanguageCommand}" FrameworkElement.Width="{Binding Path=Width,ElementName=k}" />
+                                        <Button Button.Name="o" ContentControl.Content="Français" ButtonBase.CommandParameter="French" Control.Foreground="#FFFFFFFF" FrameworkElement.HorizontalAlignment="Stretch" FrameworkElement.Height="auto" FrameworkElement.Margin="0,0,0,0" FrameworkElement.Style="{StaticResource PopupButtonStyle}" ButtonBase.Command="{Binding SetLanguageCommand}" FrameworkElement.Width="{Binding Path=Width,ElementName=k}" />
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </Popup>
+                        <Button Button.Name="p" UIElement.Visibility="Collapsed" FrameworkElement.ToolTip="{DynamicResource CONFIG_Ttile}" FrameworkElement.HorizontalAlignment="Right" FrameworkElement.Margin="10,0,0,0" FrameworkElement.Width="auto" FrameworkElement.Height="25" FrameworkElement.Style="{StaticResource FileButtonStyle}">
+                            <StackPanel StackPanel.Orientation="Horizontal" FrameworkElement.HorizontalAlignment="Center">
+                                <Image Image.Source="Icons\Main\img_config.png" UIElement.Opacity="0.7" FrameworkElement.Margin="3,0" FrameworkElement.Width="15" FrameworkElement.Height="15" Image.Stretch="Uniform" />
+                                <TextBlock TextBlock.Text="{DynamicResource CONFIG_Ttile}" UIElement.Visibility="Collapsed" TextBlock.FontSize="14" TextBlock.Foreground="#FFFFFFFF" FrameworkElement.VerticalAlignment="Center" FrameworkElement.Margin="5,0" />
+                            </StackPanel>
+                        </Button>
+                        <Button Button.Name="q" UIElement.Visibility="Collapsed" FrameworkElement.Style="{StaticResource FileButtonStyle}" FrameworkElement.HorizontalAlignment="Right" FrameworkElement.Height="25" FrameworkElement.Width="auto" FrameworkElement.Margin="10,0,0,0">
+                            <StackPanel StackPanel.Orientation="Horizontal" FrameworkElement.HorizontalAlignment="Center">
+                                <Image Image.Source="Icons\files\img_feedback.png" UIElement.Opacity="0.7" FrameworkElement.Margin="3,0" FrameworkElement.Width="15" FrameworkElement.Height="15" Image.Stretch="Uniform" />
+                                <TextBlock TextBlock.Text="{DynamicResource Global_Feedback}" UIElement.Visibility="Collapsed" TextBlock.FontSize="14" TextBlock.Foreground="#FFFFFFFF" FrameworkElement.VerticalAlignment="Center" FrameworkElement.Margin="5,0" />
+                            </StackPanel>
+                        </Button>
+                        <Button Button.Name="r" UIElement.Visibility="Collapsed" FrameworkElement.Style="{StaticResource FileButtonStyle}" FrameworkElement.HorizontalAlignment="Right" FrameworkElement.Height="25" FrameworkElement.Width="auto" FrameworkElement.Margin="10,0,0,0">
+                            <StackPanel StackPanel.Orientation="Horizontal" FrameworkElement.HorizontalAlignment="Center">
+                                <Image Image.Source="Icons\files\img_help.png" UIElement.Opacity="1" FrameworkElement.Margin="3,0" FrameworkElement.Width="15" FrameworkElement.Height="15" Image.Stretch="Uniform" />
+                                <TextBlock TextBlock.Text="{DynamicResource Global_Help}" UIElement.Visibility="Collapsed" TextBlock.FontSize="14" TextBlock.Foreground="#FFFFFFFF" FrameworkElement.VerticalAlignment="Center" FrameworkElement.Margin="5,0" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                    <controls:HomeControl p7:Grid.Row="1" xmlns:p7="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:controls="clr-namespace:DicomViewer.UserControls.Common;assembly=BeeViewer,Version=3.7.2.11397,Culture=neutral,PublicKeyToken=null" />
+                </Grid>
+                <Grid Grid.Name="s" Grid.Column="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition ColumnDefinition.Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <controls:CustomTabControl CustomTabControl.Name="t" CustomTabControl.SizeChanged="b" CustomTabControl.SelectionChanged="a" p7:Panel.ZIndex="1" p7:Grid.Column="0" p7:FrameworkElement.Margin="-2,0,0,0" p7:Control.Foreground="#FFFFFFFF" p7:Control.Background="{DynamicResource General.BackgroundColor}" p7:Control.BorderThickness="0" p7:FrameworkElement.Style="{StaticResource TabControlStyle1}" p7:FrameworkElement.Height="{Binding ElementName=grid,Path=ActualHeight}" p7:FrameworkElement.Width="{Binding ElementName=grid,Path=ActualWidth}" p7:UIElement.Visibility="{Binding ElementName=t,Path=HasItems,Converter={StaticResource bvt}}" xmlns:p7="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:controls="clr-namespace:DicomViewer.UserControls.Common;assembly=BeeViewer,Version=3.7.2.11397,Culture=neutral,PublicKeyToken=null" />
+                </Grid>
+            </Grid>
+            <view:DicomFile p5:Grid.Column="0" xmlns:p5="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:view="clr-namespace:DicomViewer.View;assembly=BeeViewer,Version=3.7.2.11397,Culture=neutral,PublicKeyToken=null" />
+            <Border Border.BorderThickness="0,0,2,0" FrameworkElement.HorizontalAlignment="Right" UIElement.Visibility="Collapsed" Border.BorderBrush="#FF353535" />
+            <StackPanel StackPanel.Name="u" Grid.Column="0" FrameworkElement.Height="25" FrameworkElement.Width="15" FrameworkElement.HorizontalAlignment="Right" FrameworkElement.VerticalAlignment="Center">
+                <Border Border.Name="v" FrameworkElement.Height="25" FrameworkElement.Width="15" Border.CornerRadius="5,0,0,5" FrameworkElement.Style="{DynamicResource borderArrow}">
+                    <StackPanel FrameworkElement.HorizontalAlignment="Right" FrameworkElement.VerticalAlignment="Center">
+                        <Image Image.Source="Icons\Files\img_arrow_left.png" FrameworkElement.VerticalAlignment="Center" Image.Stretch="UniformToFill" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+            <StackPanel StackPanel.Name="w" Grid.Column="2" FrameworkElement.Height="25" FrameworkElement.Width="15" FrameworkElement.HorizontalAlignment="Left" FrameworkElement.VerticalAlignment="Center" />
+            <controls:AirspacePopup AirspacePopup.FollowPlacementTarget="True" AirspacePopup.AllowOutsideScreenPlacement="True" p5:Popup.IsOpen="True" p5:Popup.HorizontalOffset="1" p5:Popup.VerticalOffset="0" p5:Popup.AllowsTransparency="True" p5:Popup.Placement="Center" p5:Popup.PlacementTarget="{Binding ElementName=w}" AirspacePopup.ParentWindow="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}" xmlns:p5="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:controls="clr-namespace:DicomViewer.UserControls.Common;assembly=BeeViewer,Version=3.7.2.11397,Culture=neutral,PublicKeyToken=null">
+                <StackPanel StackPanel.Name="x" Grid.Column="2" FrameworkElement.Height="25" FrameworkElement.Width="15" FrameworkElement.HorizontalAlignment="Left" FrameworkElement.VerticalAlignment="Center" UIElement.Visibility="Collapsed">
+                    <Border FrameworkElement.Height="25" FrameworkElement.Width="15" Border.CornerRadius="0,5,5,0" FrameworkElement.Style="{DynamicResource borderArrow}">
+                        <StackPanel FrameworkElement.HorizontalAlignment="Right" FrameworkElement.VerticalAlignment="Center">
+                            <Image Image.Source="Icons\Files\img_arrow_right.png" FrameworkElement.VerticalAlignment="Center" Image.Stretch="UniformToFill" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </controls:AirspacePopup>
+            <TextBox TextBox.Name="y" FrameworkElement.Height="0" TextBox.Text="{Binding AdvertisementUrl,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+            <GridSplitter Grid.Column="1" FrameworkElement.Width="2" FrameworkElement.VerticalAlignment="Stretch" FrameworkElement.HorizontalAlignment="Center" Control.Background="#FF353535" GridSplitter.ShowsPreview="False" />
+        </Grid>
+    </Grid>
+</Window>

@@ -1,0 +1,250 @@
+﻿<UserControl x:Class="MedicalImagingSystem.Views.DicomImageView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MedicalImagingSystem" 
+             xmlns:viewmodels="clr-namespace:MedicalImagingSystem.ViewModels" 
+             xmlns:conv="clr-namespace:MedicalImagingSystem.Converters" 
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             mc:Ignorable="d" 
+             >
+    <UserControl.Resources>
+        <conv:NullToVisConverter x:Key="KeyNullToVisibilityConverter"/>
+        <conv:NullToVisConverter x:Key="NullToVisibilityConverter"/>
+        <conv:BoolToScaleConverter x:Key="BoolToScaleConverter"/>
+        <conv:BoolToScaleConverterY x:Key="BoolToScaleConverterY"/>
+        <conv:AnglePointsConverter x:Key="AnglePointsConverter"/>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <conv:MidPointMultiConverter x:Key="MidPointMultiConverter"/>
+    </UserControl.Resources>
+    <Grid Background="Black">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 序列导航栏 -->
+        <!--<StackPanel Orientation="Horizontal" 
+                    Visibility="{Binding ImageSeries, Converter={StaticResource KeyNullToVisibilityConverter}}">
+            -->
+        <!--Visibility="{Binding ImageSeries, Converter={StaticResource KeyNullToVisibilityConverter}}"-->
+        <!--
+            <Button Command="{Binding PreviousFrameCommand}" Content="上一帧"/>
+            <TextBlock Text="{Binding CurrentFrameText}" VerticalAlignment="Center" Margin="10"/>
+            <Button Command="{Binding NextFrameCommand}" Content="下一帧"/>
+            <Slider Minimum="0" Maximum="{Binding ImageSeries.Count}"
+                    Value="{Binding CurrentFrameIndex}" Width="200"/>
+        </StackPanel>-->
+        <!-- DICOM 图像 -->
+        <ScrollViewer Grid.Row="1"
+                      x:Name="PART_ScrollViewer"
+                          HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto"
+                          PreviewMouseWheel="ScrollViewer_PreviewMouseWheel"
+                          PreviewMouseLeftButtonDown="Image_MouseLeftButtonDown"
+                          PreviewMouseLeftButtonUp="Image_MouseLeftButtonUp"
+                          PreviewMouseMove="Image_MouseMove">
+            <Grid>
+                <Image x:Name="PART_Image" Source="{Binding CurrentImage}" Width="auto" Height="auto"
+                   RenderOptions.BitmapScalingMode="HighQuality">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseLeftButtonDown">
+                            <i:InvokeCommandAction Command="{Binding MouseLeftButtonDownCommand}" PassEventArgsToCommand="True"/>
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="MouseMove">
+                            <i:InvokeCommandAction Command="{Binding MouseMoveCommand}" PassEventArgsToCommand="True"/>
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="MouseLeftButtonUp">
+                            <i:InvokeCommandAction Command="{Binding MouseLeftButtonUpCommand}" PassEventArgsToCommand="True"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <Image.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform x:Name="PART_ScaleTransform" ScaleX="1" ScaleY="1"/>
+                            <TranslateTransform x:Name="PART_TranslateTransform" X="0" Y="0"/>
+                        </TransformGroup>
+                    </Image.RenderTransform>
+                    <Image.LayoutTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="{Binding IsFlippedX, Converter={StaticResource BoolToScaleConverter}}"
+                        ScaleY="{Binding IsFlippedY, Converter={StaticResource BoolToScaleConverterY}}"/>
+                            <RotateTransform Angle="{Binding RotationAngle}" />
+                        </TransformGroup>
+                    </Image.LayoutTransform>
+                </Image>
+
+                <!-- 测量线和角的可视化（可用Canvas或AdornerLayer） -->
+                <Canvas x:Name="PART_Canvas" IsHitTestVisible="False">
+                    <!-- 测量线 -->
+                    <ItemsControl ItemsSource="{Binding MeasureLines}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Canvas />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <!--<Line X1="{Binding Start.X}" Y1="{Binding Start.Y}" X2="{Binding End.X}" Y2="{Binding End.Y}" Stroke="Red" StrokeThickness="2"/>-->
+                                <Canvas>
+                                    <Line X1="{Binding Start.X}" Y1="{Binding Start.Y}" X2="{Binding End.X}" Y2="{Binding End.Y}" Stroke="Red" StrokeThickness="2"/>
+                                    <TextBlock
+                                         Text="{Binding Length, StringFormat='{}{0:F1}'}"
+                                         Foreground="Red"
+                                         FontWeight="Bold"
+                                         Background="White"
+                                         Padding="2">
+                                    <Canvas.Left>
+                                     <MultiBinding Converter="{StaticResource MidPointMultiConverter}">
+                                         <Binding Path="Start.X"/>
+                                         <Binding Path="End.X"/>
+                                     </MultiBinding>
+                                    </Canvas.Left>
+                                    <Canvas.Top>
+                                     <MultiBinding Converter="{StaticResource MidPointMultiConverter}">
+                                         <Binding Path="Start.Y"/>
+                                         <Binding Path="End.Y"/>
+                                     </MultiBinding>
+                                    </Canvas.Top>
+                                    </TextBlock>
+                                </Canvas>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <!-- 测量角 -->
+                    <ItemsControl ItemsSource="{Binding MeasureAngles}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Canvas />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Canvas>
+                                    <Polyline Points="{Binding ., Converter={StaticResource AnglePointsConverter}}" Stroke="Blue" StrokeThickness="2"/>
+                                    <TextBlock Text="{Binding Angle, StringFormat='{}{0:F1}°'}" Foreground="Blue"
+                           Canvas.Left="{Binding Vertex.X}" Canvas.Top="{Binding Vertex.Y}"/>
+                                </Canvas>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+
+                    <!-- 实时预览长度 -->
+                    <TextBlock
+                         Text="{Binding PreviewLength, StringFormat='长度: {0:F1}'}"
+                         Foreground="Orange"
+                         FontWeight="Bold"
+                         Background="White"
+                         Padding="2"
+                         Visibility="{Binding PreviewLength, Converter={StaticResource NullToVisibilityConverter}}">
+                         <Canvas.Left>
+                             <MultiBinding Converter="{StaticResource MidPointMultiConverter}">
+                                 <Binding Path="PreviewStartPoint.X"/>
+                                 <Binding Path="PreviewCurrentPoint.X"/>
+                             </MultiBinding>
+                         </Canvas.Left>
+                         <Canvas.Top>
+                             <MultiBinding Converter="{StaticResource MidPointMultiConverter}">
+                                 <Binding Path="PreviewStartPoint.Y"/>
+                                 <Binding Path="PreviewCurrentPoint.Y"/>
+                             </MultiBinding>
+                         </Canvas.Top>
+                    </TextBlock>
+
+                    <!-- 实时预览角度 -->
+                    <TextBlock
+                          Text="{Binding PreviewAngle, StringFormat='角度: {0:F1}°'}"
+                          Foreground="Orange"
+                          FontWeight="Bold"
+                          Background="White"
+                          Padding="2"
+                          Visibility="{Binding PreviewAngle, Converter={StaticResource NullToVisibilityConverter}}"
+                          Canvas.Left="{Binding PreviewVertexPoint.X}"
+                          Canvas.Top="{Binding PreviewVertexPoint.Y}"/>
+
+                    <!-- 预览长度线 -->
+                    <Line x:Name="PreviewLine"
+      X1="{Binding PreviewStartPoint.X}" Y1="{Binding PreviewStartPoint.Y}"
+      X2="{Binding PreviewCurrentPoint.X}" Y2="{Binding PreviewCurrentPoint.Y}"
+      Stroke="Orange" StrokeDashArray="4 2" StrokeThickness="2"
+      Visibility="{Binding PreviewStartPoint, Converter={StaticResource NullToVisibilityConverter}}"/>
+                    <!-- 预览角度线（两段） -->
+                    <Line X1="{Binding PreviewStartPoint.X}" Y1="{Binding PreviewStartPoint.Y}"
+      X2="{Binding PreviewVertexPoint.X}" Y2="{Binding PreviewVertexPoint.Y}"
+      Stroke="Orange" StrokeDashArray="4 2" StrokeThickness="2"
+      Visibility="{Binding PreviewVertexPoint, Converter={StaticResource NullToVisibilityConverter}}"/>
+                    <Line X1="{Binding PreviewVertexPoint.X}" Y1="{Binding PreviewVertexPoint.Y}"
+      X2="{Binding PreviewCurrentPoint.X}" Y2="{Binding PreviewCurrentPoint.Y}"
+      Stroke="Orange" StrokeDashArray="4 2" StrokeThickness="2"
+      Visibility="{Binding PreviewVertexPoint, Converter={StaticResource NullToVisibilityConverter}}"/>
+
+
+                </Canvas>
+            </Grid>
+        </ScrollViewer>
+
+
+        <!-- 状态栏 -->
+        <StatusBar Grid.Row="2">
+            <StatusBarItem>
+                <TextBlock Text="{Binding CurrentImage.PixelWidth, 
+                    StringFormat='宽度: {0}px'}"/>
+            </StatusBarItem>
+            <StatusBarItem>
+                <TextBlock Text="{Binding CurrentImage.PixelHeight, 
+                    StringFormat='高度: {0}px'}"/>
+            </StatusBarItem>
+        </StatusBar>
+
+        <!-- 底部信息栏 -->
+        <Grid x:Name="imageInfoGrid" Grid.RowSpan="2" 
+              Visibility="{Binding IsImageLoaded, Converter={StaticResource BoolToVisibilityConverter}}">
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <!--<TextBlock Text="{Binding Manufacturer}" Foreground="Pink" Height="auto"></TextBlock>-->
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="EX: " Foreground="Pink"></TextBlock>
+                    <TextBlock Text="{Binding StudyId}" Foreground="Pink"></TextBlock>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="SE: 1/1" Foreground="Pink"></TextBlock>
+                    <!--<TextBlock Text="{Binding}" Foreground="Pink"></TextBlock>-->
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Im: 1" Foreground="Pink"></TextBlock>
+                    <!--<TextBlock Text="{Binding}" Foreground="Pink"></TextBlock>-->
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="W:" Foreground="Pink"></TextBlock>
+                    <TextBlock Text="{Binding WindowWidth}" Foreground="Pink"></TextBlock>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="L:" Foreground="Pink"></TextBlock>
+                    <TextBlock Text="{Binding WindowCenter}" Foreground="Pink"></TextBlock>
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Top">
+                <TextBlock Text="{Binding PatientName}" Foreground="Pink" HorizontalAlignment="Right"></TextBlock>
+                <TextBlock Text="{Binding PatientId}" Foreground="Pink" HorizontalAlignment="Right"></TextBlock>
+            </StackPanel>
+
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="X:" Foreground="Pink"  HorizontalAlignment="Right"></TextBlock>
+                    <TextBlock Text="{Binding MouseX}" Foreground="Pink"  HorizontalAlignment="Right"></TextBlock>
+                    <TextBlock Text=" Y:" Foreground="Pink"  HorizontalAlignment="Right"></TextBlock>
+                    <TextBlock Text="{Binding MouseY}" Foreground="Pink"  HorizontalAlignment="Right"></TextBlock>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+
+    </Grid>
+</UserControl>
