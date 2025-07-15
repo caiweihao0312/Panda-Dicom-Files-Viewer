@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using Dicom;
 using MedicalImagingSystem.Services;
 using MedicalImagingSystem.Messenge;
 using MedicalImagingSystem.Model;
@@ -11,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
+using FellowOakDicom;
 
 namespace MedicalImagingSystem.ViewModels
 {

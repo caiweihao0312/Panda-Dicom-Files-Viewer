@@ -1,6 +1,6 @@
-﻿using Dicom;
-using Dicom.Imaging;
-using Dicom.Imaging.Render;
+﻿using FellowOakDicom;
+using FellowOakDicom.Imaging;
+using FellowOakDicom.Imaging.Codec;
 using HandyControl.Controls;
 using MedicalImagingSystem.Helper;
 using MedicalImagingSystem.Model;
@@ -63,22 +63,41 @@ namespace MedicalImagingSystem.Services
 
                 // 加载DICOM文件
                 var dicomFile = DicomFile.Open(filePath);
+
+                // 如果传输语法是 RLE Lossless，则先做转码
+                if (dicomFile.Dataset.InternalTransferSyntax == DicomTransferSyntax.RLELossless)
+                {
+                    var transcoder = new DicomTranscoder(
+                        dicomFile.Dataset.InternalTransferSyntax,
+                        DicomTransferSyntax.ExplicitVRLittleEndian);
+                    dicomFile = transcoder.Transcode(dicomFile);
+                }
+                else if (dicomFile.Dataset.InternalTransferSyntax.IsEncapsulated)
+                {
+                    Debug.WriteLine("检测到压缩传输语法，尝试解码像素数据。");
+                    var transcoder = new DicomTranscoder(
+                        dicomFile.Dataset.InternalTransferSyntax,
+                        DicomTransferSyntax.ExplicitVRLittleEndian);
+                    dicomFile = transcoder.Transcode(dicomFile);
+                }
+                else if (dicomFile.Dataset.InternalTransferSyntax.UID.UID == "1.2.840.10008.1.2.4.100")
+                {
+                    Debug.WriteLine("检测到 MPEG2 Main Profile / Main Level 传输语法。");
+                    throw new NotSupportedException("当前不支持 MPEG2 解码，请使用外部工具或库进行解码。");
+                }
                 // 获取完整数据集
                 DicomDataset dataset = dicomFile.Dataset;
 
                 DicomTagInfoDTO dicomTagInfo = ReadMetadata(dataset);
-
-                dicomTagInfo.bitmapSource = GetDicomImage(dataset);
-
-                SetOptimalWindowing(dicomTagInfo);
-
+                //SetOptimalWindowing(dicomTagInfo);
+                dicomTagInfo.bitmapSource = GetDicomImage(dicomTagInfo,dataset);
                 return dicomTagInfo;
             }
             catch (System.Exception ex)
             {
-                Console.WriteLine($"{ex.ToString()}");
+                Debug.WriteLine($"无法加载 DICOM 文件：{ex.ToString()}");
                 //System.Windows.MessageBox.Show("无法加载 DICOM 文件。请检查文件路径或格式是否正确。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-                return null;
+                return new DicomTagInfoDTO { PatientName = "[无描述异常]" };
             }
         }
 
@@ -130,7 +149,7 @@ namespace MedicalImagingSystem.Services
                         1 when bitsAllocated <= 8 => PixelFormats.Gray8,
                         1 when bitsAllocated <= 16 => PixelFormats.Gray16,
                         3 => PixelFormats.Rgb24,
-                        _ => throw new NotSupportedException("不支持的像素格式")
+                        _ => PixelFormats.Gray8
                     };
                 }
                 else
@@ -168,7 +187,7 @@ namespace MedicalImagingSystem.Services
         /// </summary>
         /// <param name="dataset"></param>
         /// <returns></returns>
-        public BitmapSource GetDicomImage(DicomDataset dataset)
+        public BitmapSource GetDicomImage(DicomTagInfoDTO dicomTagInfo,DicomDataset dataset)
         {
             if (!dataset.Contains(DicomTag.PixelData))
             {
@@ -191,11 +210,90 @@ namespace MedicalImagingSystem.Services
             // 创建DicomImage对象进行渲染
             var dicomImage = new DicomImage(dataset);
             // 获取原始像素数据
-            var pixelData = DicomPixelData.Create(dataset);
-            int width = pixelData.Width;
-            int height = pixelData.Height;
-            int frames = pixelData.NumberOfFrames;
-            return dicomImage.RenderImage().AsWriteableBitmap();
+            var pixelDataInfo = DicomPixelData.Create(dataset);
+            int width = pixelDataInfo.Width;
+            int height = pixelDataInfo.Height;
+            int bitsAllocated = pixelDataInfo.BitsAllocated;
+            int samplesPerPixel = pixelDataInfo.SamplesPerPixel;
+            //int frames = pixelDataInfo.NumberOfFrames;
+            // 获取第一帧像素数据
+            var pixelData = pixelDataInfo.GetFrame(0).Data;
+
+            // 验证像素数据长度
+            int expectedLength = width * height * (bitsAllocated / 8) * samplesPerPixel;
+            if (pixelData.Length < expectedLength)
+            {
+                Debug.WriteLine($"像素数据长度不足。期望长度: {expectedLength}, 实际长度: {pixelData.Length}");
+                // 检查是否为压缩数据或其他特殊情况
+                if (dataset.InternalTransferSyntax.IsEncapsulated)
+                {
+                    Debug.WriteLine("检测到压缩传输语法，可能需要解码。");
+                }
+                else
+                {
+                    Debug.WriteLine("像素数据可能不完整，尝试填充或降级显示。");
+                }
+                // 填充缺失部分
+                byte defaultValue = (byte)(bitsAllocated == 8 ? 128 : 0); // 8位图像用中性灰色，16位图像用0
+                byte[] paddedPixelData = new byte[expectedLength];
+                Array.Copy(pixelData, paddedPixelData, pixelData.Length);
+                for (int i = pixelData.Length; i < expectedLength; i++)
+                {
+                    paddedPixelData[i] = defaultValue;
+                }
+                pixelData = paddedPixelData;
+            }
+            // 验证填充后的数据
+            if (pixelData.Length != expectedLength)
+            {
+                Debug.WriteLine("填充后的像素数据长度不正确，返回默认黑色图像。");
+                int widthTemp = 256;
+                int heightTemp = 256;
+                byte[] blackPixels = new byte[widthTemp * heightTemp];
+                return BitmapSource.Create(
+                    widthTemp, heightTemp,
+                    96, 96,
+                    PixelFormats.Gray8,
+                    null,
+                    blackPixels,
+                    widthTemp);
+            }
+            return ConvertPixelDataToBitmapSource(pixelData, width, height, dicomTagInfo.WindowWidth, dicomTagInfo.WindowCenter, dicomTagInfo.PixelFormat, true);
+            ///return ConvertPixelDataToBitmapSource(pixelData, width, height, dicomTagInfo.WindowWidth, dicomTagInfo.WindowCenter, pixelDataInfo.BitsAllocated, pixelDataInfo.SamplesPerPixel);
+            // 修复后的代码：
+            //var renderedImage = dicomImage.RenderImage();
+            //Debug.WriteLine($"Rendered image type: {renderedImage.GetType()}");
+            //if (renderedImage is IImage image)
+            //{
+            //    // 获取图像的宽度和高度
+            //    int width = dicomImage.Width;
+            //    int height = dicomImage.Height;
+
+            //    // 获取像素数据
+            //    var pixelData = image.Pixels.Data; // 从 PinnedIntArray 中提取实际的像素数组
+
+            //    // 动态获取像素格式
+            //    var pixelDataInfo = DicomPixelData.Create(dataset);
+            //    PixelFormat pixelFormat = pixelDataInfo.SamplesPerPixel switch
+            //    {
+            //        1 when pixelDataInfo.BitsAllocated <= 8 => PixelFormats.Gray8,
+            //        1 when pixelDataInfo.BitsAllocated <= 16 => PixelFormats.Gray16,
+            //        3 => PixelFormats.Bgr24,
+            //        _ => throw new NotSupportedException("不支持的像素格式")
+            //    };
+
+            //    // 计算 stride
+            //    int stride = (width * pixelFormat.BitsPerPixel + 7) / 8;
+
+            //    // 创建 WriteableBitmap
+            //    var writeableBitmap = new WriteableBitmap(width, height, 96, 96, pixelFormat, null);
+            //    writeableBitmap.WritePixels(new Int32Rect(0, 0, width, height), pixelData, stride, 0);
+            //    return writeableBitmap;
+            //}
+            //else
+            //{
+            //    throw new InvalidOperationException("Rendered image is not compatible with WriteableBitmap.");
+            //}
 
             // 不使用 LUT
             //dicomImage.UseVOILUT = false;
@@ -236,13 +334,8 @@ namespace MedicalImagingSystem.Services
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public List<BitmapSource> GetMultiframeImages(string filePath)
+        public List<BitmapSource> GetMultiframeImages(DicomDataset dataset)
         {
-            // 加载DICOM文件
-            var dicomFile = DicomFile.Open(filePath);
-
-            // 获取完整数据集
-            DicomDataset dataset = dicomFile.Dataset;
             var frames = new List<BitmapSource>();
             if (dataset.Contains(DicomTag.NumberOfFrames))
             {
@@ -272,11 +365,11 @@ namespace MedicalImagingSystem.Services
                     frames.Add(bitmap);
                 }
             }
-            else
-            {
-                BitmapSource bitmapSource = GetDicomImage(dataset);
-                frames.Add(bitmapSource);
-            }
+            //else
+            //{
+            //    BitmapSource bitmapSource = GetDicomImage(dataset);
+            //    frames.Add(bitmapSource);
+            //}
             return frames;
         }
 
@@ -292,7 +385,17 @@ namespace MedicalImagingSystem.Services
             foreach (var file in Directory.GetFiles(directoryPath, "*.dcm"))
             {
                 var dicomImage = new DicomImage(file);
-                images.Add(dicomImage.RenderImage().AsWriteableBitmap());
+                // 修复后的代码：
+                var renderedImage = dicomImage.RenderImage();
+                if (renderedImage is IImage image)
+                {
+                    images.Add(image.As<WriteableBitmap>());
+                    //return image.As<WriteableBitmap>();
+                }
+                else
+                {
+                    throw new InvalidOperationException("Rendered image is not compatible with WriteableBitmap.");
+                }
             }
             return images;
         }
@@ -306,6 +409,8 @@ namespace MedicalImagingSystem.Services
         /// </summary>
         public BitmapSource ConvertPixelDataToBitmapSource(byte[] pixelData, int width, int height, double windowWidth, double windowLevel, PixelFormat pixelFormat, bool invert = false)
         {
+            //return ProcessDicomImage(pixelData, width, height, windowWidth, windowLevel, pixelFormat, invert);
+
             if (pixelFormat == PixelFormats.Gray8)
             {
                 // 灰度图像窗宽窗位处理
@@ -334,25 +439,45 @@ namespace MedicalImagingSystem.Services
             else if (pixelFormat == PixelFormats.Gray16)
             {
                 // 16位灰度图像窗宽窗位处理
-                // 需要将ushort数据映射到8位显示
                 int pixelCount = width * height;
                 byte[] output = new byte[pixelCount];
+
+                // 设置默认窗宽窗位
+                if (windowWidth <= 0 || windowLevel <= 0)
+                {
+                    ushort minPixelValue = ushort.MaxValue;
+                    ushort maxPixelValue = ushort.MinValue;
+
+                    for (int i = 0; i < pixelData.Length; i += 2)
+                    {
+                        ushort value = (ushort)(pixelData[i] | (pixelData[i + 1] << 8));
+                        if (value < minPixelValue) minPixelValue = value;
+                        if (value > maxPixelValue) maxPixelValue = value;
+                    }
+
+                    windowLevel = (minPixelValue + maxPixelValue) / 2.0;
+                    windowWidth = maxPixelValue - minPixelValue;
+                }
                 double min = windowLevel - windowWidth / 2.0;
                 double max = windowLevel + windowWidth / 2.0;
+
+                if (min < 0) min = 0;
+                if (max > ushort.MaxValue) max = ushort.MaxValue;
+
+                // 映射像素值
                 for (int i = 0; i < pixelCount; i++)
                 {
-                    // 16位数据每像素2字节，低字节在前（小端序）
                     ushort value = (ushort)(pixelData[i * 2] | (pixelData[i * 2 + 1] << 8));
                     double mapped;
+
                     if (value <= min)
                         mapped = 0;
                     else if (value > max)
                         mapped = 255;
                     else
                         mapped = ((value - min) / windowWidth) * 255.0;
-                    // 灰度反转（由参数控制）
-                    output[i] = invert ? (byte)(255 - Math.Clamp(mapped, 0, 255)) : (byte)Math.Clamp(mapped, 0, 255);
 
+                    output[i] = invert ? (byte)(255 - Math.Clamp(mapped, 0, 255)) : (byte)Math.Clamp(mapped, 0, 255);
                 }
                 int stride = width;
                 var bitmap = BitmapSource.Create(width, height, 96, 96, PixelFormats.Gray8, null, output, stride);
@@ -421,13 +546,186 @@ namespace MedicalImagingSystem.Services
                 //bitmap2.Freeze();
                 //return bitmap2;
             }
+            else if (pixelFormat == PixelFormats.Bgr24)
+            {
+                int stride = width * 3; // 每行字节数
+                var bitmap = BitmapSource.Create(
+                    width, height,
+                    96, 96, // DPI
+                    PixelFormats.Bgr24,
+                    null, // 调色板（Bgr24 不需要调色板）
+                    pixelData,
+                    stride);
+                bitmap.Freeze(); // 冻结以提高跨线程安全性
+                return bitmap;
+            }
             else
             {
-                System.Windows.MessageBox.Show("不支持的像素格式", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Windows.MessageBox.Show("不支持的像素格式：" + pixelFormat.ToString(), "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                 return null;
             }
         }
 
+
+        public BitmapSource ProcessDicomImage(byte[] pixelData, int width, int height, double windowWidth, double windowCenter, PixelFormat pixelFormat, bool invert = false)
+        {
+            if (pixelFormat == PixelFormats.Gray8)
+            {
+                // 处理 Gray8 图像
+                return ProcessGray8(pixelData, width, height, windowWidth, windowCenter, invert);
+            }
+            else if (pixelFormat == PixelFormats.Gray16)
+            {
+                // 处理 Gray16 图像
+                return ProcessGray16(pixelData, width, height, windowWidth, windowCenter, invert);
+            }
+            else if (pixelFormat == PixelFormats.Rgb24 || pixelFormat == PixelFormats.Bgr24)
+            {
+                // 处理 Rgb24 或 Bgr24 图像
+                return ProcessRgb24(pixelData, width, height, pixelFormat);
+            }
+            else
+            {
+                throw new NotSupportedException($"不支持的像素格式: {pixelFormat}");
+            }
+        }
+
+        // 处理 Gray8 图像
+        private BitmapSource ProcessGray8(byte[] pixelData, int width, int height, double windowWidth, double windowCenter, bool invert)
+        {
+            double min = windowCenter - windowWidth / 2.0;
+            double max = windowCenter + windowWidth / 2.0;
+
+            byte[] output = new byte[pixelData.Length];
+            for (int i = 0; i < pixelData.Length; i++)
+            {
+                double value = pixelData[i];
+                byte mapped = value <= min ? (byte)0 : value > max ? (byte)255 : (byte)(((value - min) / windowWidth) * 255.0);
+                output[i] = invert ? (byte)(255 - mapped) : mapped;
+            }
+
+            int stride = width;
+            return BitmapSource.Create(width, height, 96, 96, PixelFormats.Gray8, null, output, stride);
+        }
+
+        // 处理 Gray16 图像
+        private BitmapSource ProcessGray16(byte[] pixelData, int width, int height, double windowWidth, double windowCenter, bool invert)
+        {
+            int pixelCount = width * height;
+            byte[] output = new byte[pixelCount];
+
+            double min = windowCenter - windowWidth / 2.0;
+            double max = windowCenter + windowWidth / 2.0;
+
+            for (int i = 0; i < pixelCount; i++)
+            {
+                ushort value = (ushort)(pixelData[i * 2] | (pixelData[i * 2 + 1] << 8));
+                double mapped = value <= min ? 0 : value > max ? 255 : ((value - min) / windowWidth) * 255.0;
+                output[i] = invert ? (byte)(255 - Math.Clamp(mapped, 0, 255)) : (byte)Math.Clamp(mapped, 0, 255);
+            }
+
+            int stride = width;
+            return BitmapSource.Create(width, height, 96, 96, PixelFormats.Gray8, null, output, stride);
+        }
+
+        // 处理 Rgb24 或 Bgr24 图像
+        private BitmapSource ProcessRgb24(byte[] pixelData, int width, int height, PixelFormat pixelFormat)
+        {
+            int stride = width * 3; // 每行字节数
+            return BitmapSource.Create(width, height, 96, 96, pixelFormat, null, pixelData, stride);
+        }
+
+        public BitmapSource ConvertPixelDataToBitmapSource(byte[] pixelData, int width, int height, double windowWidth, double windowLevel, int bitsAllocated, int samplesPerPixel)
+        {
+            PixelFormat pixelFormat = samplesPerPixel switch
+            {
+                1 when bitsAllocated <= 8 => PixelFormats.Gray8,
+                1 when bitsAllocated <= 16 => PixelFormats.Gray16,
+                3 => PixelFormats.Bgr24,
+                _ => throw new NotSupportedException("不支持的像素格式")
+            };
+
+            if (pixelFormat == PixelFormats.Gray8)
+            {
+                int stride = width;
+                var bitmap = BitmapSource.Create(
+                    width, height,
+                    96, 96,
+                    PixelFormats.Gray8,
+                    null,
+                    pixelData,
+                    stride);
+                bitmap.Freeze();
+                return bitmap;
+            }
+            else if (pixelFormat == PixelFormats.Gray16)
+            {
+                // 16位灰度图像窗宽窗位处理
+                int pixelCount = width * height;
+                byte[] output = new byte[pixelCount];
+
+                // 设置默认窗宽窗位
+                if (windowWidth <= 0 || windowLevel <= 0)
+                {
+                    ushort minPixelValue = ushort.MaxValue;
+                    ushort maxPixelValue = ushort.MinValue;
+
+                    for (int i = 0; i < pixelData.Length; i += 2)
+                    {
+                        ushort value = (ushort)(pixelData[i] | (pixelData[i + 1] << 8));
+                        if (value < minPixelValue) minPixelValue = value;
+                        if (value > maxPixelValue) maxPixelValue = value;
+                    }
+
+                    windowLevel = (minPixelValue + maxPixelValue) / 2.0;
+                    windowWidth = maxPixelValue - minPixelValue;
+                }
+
+                double min = windowLevel - windowWidth / 2.0;
+                double max = windowLevel + windowWidth / 2.0;
+
+                if (min < 0) min = 0;
+                if (max > ushort.MaxValue) max = ushort.MaxValue;
+
+                // 映射像素值
+                for (int i = 0; i < pixelCount; i++)
+                {
+                    ushort value = (ushort)(pixelData[i * 2] | (pixelData[i * 2 + 1] << 8));
+                    double mapped;
+
+                    if (value <= min)
+                        mapped = 0;
+                    else if (value > max)
+                        mapped = 255;
+                    else
+                        mapped = ((value - min) / windowWidth) * 255.0;
+
+                    output[i] = (byte)(255 - Math.Clamp(mapped, 0, 255));
+                }
+
+                int stride = width;
+                var bitmap = BitmapSource.Create(width, height, 96, 96, PixelFormats.Gray8, null, output, stride);
+                bitmap.Freeze();
+                return bitmap;
+            }
+            else if (pixelFormat == PixelFormats.Bgr24)
+            {
+                int stride = width * 3;
+                var bitmap = BitmapSource.Create(
+                    width, height,
+                    96, 96,
+                    PixelFormats.Bgr24,
+                    null,
+                    pixelData,
+                    stride);
+                bitmap.Freeze();
+                return bitmap;
+            }
+            else
+            {
+                throw new NotSupportedException("不支持的像素格式");
+            }
+        }
         /// <summary>
         /// 若窗宽窗位未设置，则根据像素数据自动计算最佳窗宽窗位。
         /// </summary>
@@ -438,13 +736,53 @@ namespace MedicalImagingSystem.Services
             {
                 // 以byte为例，灰度图
                 var pixelData = dto.PixelData;
-                if (pixelData != null && pixelData.Length > 0)
+                ushort[] histogram = new ushort[ushort.MaxValue + 1];
+                int totalPixels = pixelData.Length / 2;
+
+                // 计算直方图
+                for (int i = 0; i < pixelData.Length; i += 2)
                 {
-                    byte min = pixelData.Min();
-                    byte max = pixelData.Max();
-                    dto.WindowCenter = (min + max) / 2.0;
-                    dto.WindowWidth = max - min;
+                    ushort value = (ushort)(pixelData[i] | (pixelData[i + 1] << 8));
+                    histogram[value]++;
                 }
+
+                // 计算累积直方图
+                int[] cumulativeHistogram = new int[histogram.Length];
+                cumulativeHistogram[0] = histogram[0];
+                for (int i = 1; i < histogram.Length; i++)
+                {
+                    cumulativeHistogram[i] = cumulativeHistogram[i - 1] + histogram[i];
+                }
+
+                // 确定有效像素值范围（排除 2% 和 98% 的像素值）
+                int lowerBoundIndex = (int)(totalPixels * 0.05); // 2% 的像素值
+                int upperBoundIndex = (int)(totalPixels * 0.95); // 98% 的像素值
+
+                ushort minPixelValue = 0;
+                ushort maxPixelValue = 0;
+
+                for (int i = 0; i < cumulativeHistogram.Length; i++)
+                {
+                    if (cumulativeHistogram[i] >= lowerBoundIndex)
+                    {
+                        minPixelValue = (ushort)i;
+                        break;
+                    }
+                }
+
+                for (int i = cumulativeHistogram.Length - 1; i >= 0; i--)
+                {
+                    if (cumulativeHistogram[i] <= upperBoundIndex)
+                    {
+                        maxPixelValue = (ushort)i;
+                        break;
+                    }
+                }
+
+                // 计算窗宽和窗位
+                dto.WindowCenter = (minPixelValue + maxPixelValue) / 2.0;
+                dto.WindowWidth = maxPixelValue - minPixelValue ;
+
             }
         }
 

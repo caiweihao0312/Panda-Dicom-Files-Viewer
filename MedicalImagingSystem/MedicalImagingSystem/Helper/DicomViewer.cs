@@ -1,6 +1,5 @@
-﻿using Dicom;
-using Dicom.Imaging;
-using Dicom.Imaging.Codec;
+﻿using FellowOakDicom;
+using FellowOakDicom.Imaging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,20 +15,20 @@ namespace MedicalImagingSystem.Helper
         private DicomPixelData _pixelData;
         private DicomImage _dicomImage;
 
-        public void LoadFile(string filePath)
-        {
-            var dicomFile = DicomFile.Open(filePath);
-            _dataset = dicomFile.Dataset;
+        //public void LoadFile(string filePath)
+        //{
+        //    var dicomFile = DicomFile.Open(filePath);
+        //    _dataset = dicomFile.Dataset;
 
-            // 处理压缩图像
-            if (_dataset.InternalTransferSyntax.IsEncapsulated)
-            {
-                _dataset = _dataset.Clone(DicomTransferSyntax.ExplicitVRLittleEndian);
-            }
+        //    // 处理压缩图像
+        //    if (_dataset.InternalTransferSyntax.IsEncapsulated)
+        //    {
+        //        _dataset = _dataset.Clone(DicomTransferSyntax.ExplicitVRLittleEndian);
+        //    }
 
-            _pixelData = DicomPixelData.Create(_dataset);
-            _dicomImage = new DicomImage(_dataset);
-        }
+        //    _pixelData = DicomPixelData.Create(_dataset);
+        //    _dicomImage = new DicomImage(_dataset);
+        //}
 
         public PatientInfo GetPatientInfo()
         {
@@ -51,12 +50,12 @@ namespace MedicalImagingSystem.Helper
             );
         }
 
-        public BitmapSource RenderImage(double windowCenter, double windowWidth)
-        {
-            _dicomImage.WindowCenter = windowCenter;
-            _dicomImage.WindowWidth = windowWidth;
-            return _dicomImage.RenderImage().AsWriteableBitmap();
-        }
+        //public BitmapSource RenderImage(double windowCenter, double windowWidth)
+        //{
+        //    _dicomImage.WindowCenter = windowCenter;
+        //    _dicomImage.WindowWidth = windowWidth;
+        //    return _dicomImage.RenderImage().AsWriteableBitmap();
+        //}
 
         public IList<DicomTagInfo> GetAllTags()
         {

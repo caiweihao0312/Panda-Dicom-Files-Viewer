@@ -48,7 +48,7 @@
                           PreviewMouseLeftButtonUp="Image_MouseLeftButtonUp"
                           PreviewMouseMove="Image_MouseMove">
             <Grid>
-                <Image x:Name="PART_Image" Source="{Binding CurrentImage}" Width="auto" Height="auto"
+                <Image x:Name="PART_Image" Source="{Binding CurrentImage}" Width="auto" Height="auto" Stretch="UniformToFill"
                    RenderOptions.BitmapScalingMode="HighQuality">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="MouseLeftButtonDown">

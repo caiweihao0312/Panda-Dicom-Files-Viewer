@@ -1,4 +1,4 @@
-﻿using Dicom.Imaging;
+﻿using FellowOakDicom;
 using MedicalImagingSystem.Model;
 using System;
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ namespace MedicalImagingSystem.Services
     public interface IDicomService
     {
         DicomTagInfoDTO LoadDicomImage(string filePath);
-        List<BitmapSource> GetMultiframeImages(string filePath);
+        List<BitmapSource> GetMultiframeImages(DicomDataset dataset);
         ObservableCollection<BitmapSource> LoadDicomSeries(string directoryPath);
         BitmapSource ConvertPixelDataToBitmapSource(byte[] pixelData, int width, int height, double windowWidth, double windowLevel, PixelFormat pixelFormat, bool invert = false);
     }

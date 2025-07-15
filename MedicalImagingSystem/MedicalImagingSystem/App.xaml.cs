@@ -1,4 +1,6 @@
-﻿using Dicom.Imaging;
+﻿using FellowOakDicom;
+using FellowOakDicom.Imaging;
+using FellowOakDicom.IO;
 using HandyControl.Tools.Extension;
 using MedicalImagingSystem.Converters;
 using MedicalImagingSystem.Services;
@@ -10,6 +12,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -32,6 +35,7 @@ namespace MedicalImagingSystem
             // 在程序启动时注册编码提供器
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
+            DicomTransferSyntax.Register(DicomUID.RLELossless, Endian.Little);
             base.OnStartup(e);
 
             // 检查资源是否已加载
@@ -42,7 +46,7 @@ namespace MedicalImagingSystem
             }
 
             // 在应用程序启动时，确保设置了正确的图像管理器：
-            ImageManager.SetImplementation(WPFImageManager.Instance);
+            //ImageManager.SetImplementation(WPFImageManager.Instance);
 
             // 1. 创建服务注册表，配置依赖注入容器
             var services = new ServiceCollection();
