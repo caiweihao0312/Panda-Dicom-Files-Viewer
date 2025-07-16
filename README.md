@@ -1,5 +1,5 @@
 # Panda-Dicom-Files-Viewer
-DICOM影像文件查看器
+MedicalImagingSystem——DICOM影像文件查看器
 
 主要包括基本的DICOM影像文件查看功能
 文件操作：
@@ -20,3 +20,8 @@ DICOM影像文件查看器
 2、长度测量：在图像上，点击鼠标进行拖动测量长度；
 3、角度测量：在图像上，点击鼠标进行拖动测量角度；
 4、清除测量：清除在图像上已操作的测量数据；
+
+MedicalConsoleApp——DICOM 协议测试验证控制台工具
+
+一款基于.NET 平台的命令行测试工具，面向 PACS 与影像工作站的 DICOM 标准协议测试与验证，
+支持 DICOM 应用实体（AE）建立关联，覆盖 C-STORE、C-MOVE、C-GET、C-FIND 等 10+种 DIMSE操作场景，满足多种影像传输与查询需求。
