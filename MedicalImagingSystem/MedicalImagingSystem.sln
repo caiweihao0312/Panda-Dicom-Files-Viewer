@@ -5,6 +5,8 @@ VisualStudioVersion = 17.14.36221.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MedicalImagingSystem", "MedicalImagingSystem\MedicalImagingSystem.csproj", "{19F84B6E-6659-85FF-8C81-217D46578963}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MedicalConsoleApp", "MedicalConsoleApp\MedicalConsoleApp.csproj", "{9F066D8A-FED4-48C8-AE37-8F85BC283C9E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,14 @@ Global
 		{19F84B6E-6659-85FF-8C81-217D46578963}.Release|Any CPU.Build.0 = Release|Any CPU
 		{19F84B6E-6659-85FF-8C81-217D46578963}.Release|x64.ActiveCfg = Release|x64
 		{19F84B6E-6659-85FF-8C81-217D46578963}.Release|x64.Build.0 = Release|x64
+		{9F066D8A-FED4-48C8-AE37-8F85BC283C9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F066D8A-FED4-48C8-AE37-8F85BC283C9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F066D8A-FED4-48C8-AE37-8F85BC283C9E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9F066D8A-FED4-48C8-AE37-8F85BC283C9E}.Debug|x64.Build.0 = Debug|Any CPU
+		{9F066D8A-FED4-48C8-AE37-8F85BC283C9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F066D8A-FED4-48C8-AE37-8F85BC283C9E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F066D8A-FED4-48C8-AE37-8F85BC283C9E}.Release|x64.ActiveCfg = Release|Any CPU
+		{9F066D8A-FED4-48C8-AE37-8F85BC283C9E}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
