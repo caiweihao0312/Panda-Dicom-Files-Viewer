@@ -68,7 +68,7 @@ namespace MedicalImagingSystem.Views
             translateTransform.Y = position.Y - absY * newScale;
 
             // 限制图像不超出边界
-            LimitImagePosition(scaleTransform, translateTransform);
+            //LimitImagePosition(scaleTransform, translateTransform);
 
             e.Handled = true;
         }
