@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -31,7 +32,10 @@ namespace MedicalImagingSystem
         /// 应用程序启动时执行
         /// </summary>
         protected override void OnStartup(StartupEventArgs e)
-        {
+        {        
+            // 注册全局异常处理
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            this.DispatcherUnhandledException += App_DispatcherUnhandledException;
             // 在程序启动时注册编码提供器
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
@@ -75,6 +79,24 @@ namespace MedicalImagingSystem
             // 若有其他 ViewModel 也需注入服务，均可通过构造函数方式实现
             var mainWindow = App.ServiceProvider.GetRequiredService<MainWindow>();
             mainWindow.Show();
+        }
+
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Exception ex = e.ExceptionObject as Exception;
+            if (ex != null)
+            {
+                Debug.WriteLine(ex, "未处理的异常");
+            }
+            MessageBox.Show("发生未处理的异常，请联系管理员！");
+        }
+
+        private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            Exception ex = e.Exception;
+            Debug.WriteLine(ex, "Dispatcher 未处理的异常");
+            MessageBox.Show("发生未处理的异常，请联系管理员！");
+            e.Handled = true;  // 标记异常已处理，防止应用程序崩溃
         }
     }
 }
