@@ -1,0 +1,41 @@
+<Window x:Class="CbctHostApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:CbctHostApp"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        Title="CBCT 上位机控制台" Height="600" Width="900"
+        mc:Ignorable="d">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+            <Button Content="开始扫描" Command="{Binding StartScanCommand}" Width="100" Margin="0,0,10,0"/>
+            <Button Content="停止扫描" Command="{Binding StopScanCommand}" Width="100"/>
+        </StackPanel>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="3*"/>
+            </Grid.ColumnDefinitions>
+            <GroupBox Header="扫描参数" Margin="0,0,10,0">
+                <StackPanel>
+                    <TextBlock Text="FOV (mm)" />
+                    <TextBox Text="{Binding ScanParams.Fov}" />
+                    <TextBlock Text="帧率 (fps)" Margin="0,10,0,0" />
+                    <TextBox Text="{Binding ScanParams.FrameRate}" />
+                    <TextBlock Text="曝光时间 (ms)" Margin="0,10,0,0" />
+                    <TextBox Text="{Binding ScanParams.ExposureTime}" />
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Grid.Column="1" Header="实时重建预览">
+                <Image Source="{Binding PreviewImage}" Stretch="Uniform"/>
+            </GroupBox>
+        </Grid>
+    </Grid>
+</Window>

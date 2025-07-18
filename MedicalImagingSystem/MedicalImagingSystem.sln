@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MedicalImagingSystem", "Med
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MedicalConsoleApp", "MedicalConsoleApp\MedicalConsoleApp.csproj", "{9F066D8A-FED4-48C8-AE37-8F85BC283C9E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CbctHostApp", "CbctHostApp\CbctHostApp.csproj", "{3831C623-67C3-0ADE-DBDF-5867D6A47C89}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,14 @@ Global
 		{9F066D8A-FED4-48C8-AE37-8F85BC283C9E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9F066D8A-FED4-48C8-AE37-8F85BC283C9E}.Release|x64.ActiveCfg = Release|Any CPU
 		{9F066D8A-FED4-48C8-AE37-8F85BC283C9E}.Release|x64.Build.0 = Release|Any CPU
+		{3831C623-67C3-0ADE-DBDF-5867D6A47C89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3831C623-67C3-0ADE-DBDF-5867D6A47C89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3831C623-67C3-0ADE-DBDF-5867D6A47C89}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3831C623-67C3-0ADE-DBDF-5867D6A47C89}.Debug|x64.Build.0 = Debug|Any CPU
+		{3831C623-67C3-0ADE-DBDF-5867D6A47C89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3831C623-67C3-0ADE-DBDF-5867D6A47C89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3831C623-67C3-0ADE-DBDF-5867D6A47C89}.Release|x64.ActiveCfg = Release|Any CPU
+		{3831C623-67C3-0ADE-DBDF-5867D6A47C89}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

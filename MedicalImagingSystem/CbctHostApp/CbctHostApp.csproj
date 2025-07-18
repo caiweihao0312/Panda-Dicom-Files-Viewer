@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Services\IOpenIgtLinkService.cs" />
+    <Compile Remove="Services\OpenIgtLinkService.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+      <!-- Modbus RTU/TCP 实现 -->
+	  <PackageReference Include="NModbus" Version="3.0.81" />
+	  <PackageReference Include="NModbus.Serial" Version="3.0.81" />
+	  <PackageReference Include="System.IO.Ports" Version="9.0.7" />
+
+	  <!-- MVVM 框架 -->
+	  <PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
+  </ItemGroup>
+</Project>
