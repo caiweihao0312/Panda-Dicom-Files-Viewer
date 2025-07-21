@@ -1,5 +1,5 @@
 # Panda-Dicom-Files-Viewer
-MedicalImagingSystem——DICOM影像文件查看器
+**MedicalImagingSystem——DICOM影像文件查看器**
 
 主要包括基本的DICOM影像文件查看功能
 
@@ -35,13 +35,13 @@ MedicalImagingSystem——DICOM影像文件查看器
 4、清除测量：清除在图像上已操作的测量数据；
 
 
-MedicalConsoleApp项目——DICOM 协议测试验证控制台工具
+**MedicalConsoleApp项目——DICOM 协议测试验证控制台工具**
 
 一款基于.NET 平台的命令行测试工具，面向 PACS 与影像工作站的 DICOM 标准协议测试与验证，
 支持 DICOM 应用实体（AE）建立关联，覆盖 C-STORE、C-MOVE、C-GET、C-FIND 等 10+种 DIMSE操作场景，满足多种影像传输与查询需求。
 
 
-CbctHostApp项目——Modbus 协议与硬件设备通信验证WPF程序
+**CbctHostApp项目——Modbus 协议与硬件设备通信验证WPF程序**
 
 一个基于 WPF 的医学影像系统，主要功能包括通过 Modbus 协议与硬件设备通信、参数下发、图像重建与预览。
 项目采用 MVVM 架构，核心逻辑集中在视图模型（MainViewModel）中，支持异步扫描控制和图像展示。
@@ -76,7 +76,8 @@ CbctHostApp项目——Modbus 协议与硬件设备通信验证WPF程序
 
 
 
-**DemoHardwareIntegrationApp** 项目是一个基于 .NET 8 的控制台应用，主要用于演示和实现硬件集成通信，支持串口与 TCP 网络的数据交互。
+**DemoHardwareIntegrationApp** 项目
+是一个基于 .NET 8 的控制台应用，主要用于演示和实现硬件集成通信，支持串口与 TCP 网络的数据交互。
 项目采用 Microsoft.Extensions.Hosting 框架，具备现代后台服务（HostedService）架构，便于扩展和维护。
 
 ### 主要功能与结构
