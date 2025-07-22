@@ -1,5 +1,6 @@
 ﻿using NModbus;
 using System.IO.Ports;
+using NModbus.Serial; // 添加此命名空间引用
 
 namespace MedicalConsoleApp.Services
 {
@@ -44,6 +45,7 @@ namespace MedicalConsoleApp.Services
     {
         private readonly string _portName;  // 串口名称（如 COM1）
         private readonly int _baudRate;     // 波特率（如 9600）
+        private SerialPort _port;
 
         // 构造函数，初始化串口名称和波特率
         public ModbusService(string portName, int baudRate)
@@ -86,15 +88,17 @@ namespace MedicalConsoleApp.Services
             try
             {
                 // 初始化串口通信
-                using var serial = new SerialPort(_portName, _baudRate)
+                _port = new SerialPort(_portName, _baudRate)
                 {
                     ReadTimeout = 5000,  // 设置读取超时时间为 5000 毫秒
                     WriteTimeout = 5000 // 设置写入超时时间为 5000 毫秒
                 };
 
-                serial.Open(); // 打开串口
+                _port.Open(); // 打开串口
+
                 var factory = new ModbusFactory(); // 创建 Modbus 工厂
-                var master = factory.CreateRtuMaster((NModbus.IO.IStreamResource)serial); // 创建 RTU 主站
+
+                var master = factory.CreateRtuMaster(new SerialPortAdapter(_port)); // 使用正确的 SerialPortAdapter 命名空间
 
                 // 示例：读取寄存器
                 ushort startAddress = 0;    // 起始寄存器地址
@@ -218,5 +222,13 @@ namespace MedicalConsoleApp.Services
                 Console.WriteLine($"未知错误：{ex.Message}");
             }
         }
+
+        private void Port_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            int bytes = _port.BytesToRead;
+            byte[] buffer = new byte[bytes];
+            _port.Read(buffer, 0, bytes);
+        }
+
     }
 }
