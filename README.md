@@ -47,6 +47,9 @@
 - **日志**：Serilog  
 - **样式**：XAML  
 
+## 截图示例
+<img width="2559" height="1516" alt="image" src="https://github.com/user-attachments/assets/eec0f4f4-49aa-4fc4-aaa8-d04996cd0344" />
+
 
 
 # **MedicalConsoleApp项目——DICOM 协议测试验证控制台工具**
@@ -106,6 +109,10 @@ MedicalConsoleApp 是一个基于 DICOM 和 MODBUS 协议的医学影像通信�
 	错误处理：
 	捕获串口通信中的异常（如超时、端口占用等），并提供友好的错误提示。
 
+## 截图示例
+<img width="1981" height="1516" alt="image" src="https://github.com/user-attachments/assets/b67ad6f0-9807-4d98-aa1d-a8dbbaa01c54" />
+
+<img width="1981" height="1090" alt="image" src="https://github.com/user-attachments/assets/94019685-d474-42a3-bf3d-9dfefdf505ba" />
 
 
 # **CbctHostApp项目——Modbus 协议与硬件设备通信验证WPF程序**
